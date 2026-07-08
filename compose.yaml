@@ -38,7 +38,7 @@
 #     jwt_secret = "dev-only-insecure-jwt-secret-change-me-for-real-deployments"
 #     [database]
 #     backend = "postgresql"
-#     url = "postgresql+psycopg://turnstone:turnstone@localhost:5432/turnstone"
+#     url = "postgresql+psycopg://turnstone:turnstone@localhost:5433/turnstone"
 #     [api]
 #     base_url = "http://localhost:8000/v1"
 #     api_key = "dummy"
@@ -48,7 +48,7 @@
 #     TURNSTONE_NODE_ID=host-1 \
 #       TURNSTONE_ADVERTISE_URL=http://host.docker.internal:8080 \
 #       TURNSTONE_CONSOLE_URL=http://localhost:8090 \
-#       TURNSTONE_SEARXNG_URL=http://localhost:8081 \
+#       TURNSTONE_SEARXNG_URL=http://localhost:9081 \
 #       turnstone-server --host 0.0.0.0 --port 8080
 # The node registers in Postgres, auto-enrolls its mTLS cert from the console's
 # ACME endpoint (when the cluster runs mTLS), and the console collector reaches
@@ -83,7 +83,7 @@ x-shared:
   # All services point at the same Postgres. Node discovery REQUIRES a shared
   # DB: each server registers + heartbeats into a `services` table that the
   # console polls. (SQLite-per-container can't see other containers.)
-  db-url: &db-url "${TURNSTONE_DB_URL:-postgresql+psycopg://${POSTGRES_USER:-turnstone}:${POSTGRES_PASSWORD:-turnstone}@postgres:5432/turnstone}"
+  db-url: &db-url "${TURNSTONE_DB_URL:-postgresql+psycopg://${POSTGRES_USER:-turnstone}:${POSTGRES_PASSWORD:-turnstone}@postgres:5433/turnstone}"
 
 services:
   # -------------------------------------------------------------------
@@ -110,7 +110,7 @@ services:
     # database with the insecure default password to your network. (The legacy
     # POSTGRES_BIND is still honored as a fallback when TURNSTONE_HOST_IP is unset.)
     ports:
-      - "${TURNSTONE_HOST_IP:-${POSTGRES_BIND:-127.0.0.1}}:${POSTGRES_PORT:-5432}:5432"
+      - "${TURNSTONE_HOST_IP:-${POSTGRES_BIND:-127.0.0.1}}:${POSTGRES_PORT:-5433}:5433"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -246,7 +246,7 @@ services:
     # triggers the SearxNG AGPL-3.0 §13 source-offer obligation (see docs/docker.md).
     # In-compose nodes always use the internal http://searxng:8080 and ignore this.
     ports:
-      - "${TURNSTONE_HOST_IP:-127.0.0.1}:${SEARXNG_API_PORT:-8081}:8080"
+      - "${TURNSTONE_HOST_IP:-127.0.0.1}:${SEARXNG_API_PORT:-9081}:8080"
     volumes:
       - ./turnstone/deploy/searxng:/etc/searxng:ro
       - searxng-cache:/var/cache/searxng # favicon + internal SQLite cache (survives restarts)
