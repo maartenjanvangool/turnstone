@@ -110,7 +110,7 @@ services:
     # database with the insecure default password to your network. (The legacy
     # POSTGRES_BIND is still honored as a fallback when TURNSTONE_HOST_IP is unset.)
     ports:
-      - "${TURNSTONE_HOST_IP:-${POSTGRES_BIND:-127.0.0.1}}:${POSTGRES_PORT:-5433}:5433"
+      - "${TURNSTONE_HOST_IP:-${POSTGRES_BIND:-127.0.0.1}}:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
